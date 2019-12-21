@@ -44,6 +44,8 @@ class HttpReqTableSelectInvoker extends MapBasedTableInvoker {
       logger.info("request:{}|{}", 'Y', requestUrl);
       final String jsonStr = EntityUtils.toString(response.getEntity());
       final Map map = JSON.parseObject(jsonStr, Map.class);
+      logger.debug(
+          "request:{}|{}, params: {}, responses: {}", 'Y', tableDef.getUrl(), request, map);
       return getData(map);
     } catch (IOException e) {
       throw new HttpApiInvokeException("invoke " + requestUrl + " failed", e);

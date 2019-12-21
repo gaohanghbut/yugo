@@ -1,6 +1,5 @@
 package cn.yxffcode.yugo.obj.http;
 
-import cn.yxffcode.yugo.obj.ParameterIndex;
 import com.google.common.collect.ImmutableMap;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.enumerable.EnumerableRel;
@@ -13,11 +12,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * 在{@link HttpTableInsertExecutionLogic#implement(HttpTableModify, ParameterIndex,
- * EnumerableRelImplementor, EnumerableRel.Prefer)} 中生成代码时可使用的方法调用
+ * 在{@link HttpTableInsertExecutionLogic#implement(HttpTableModify, java.util.List, EnumerableRelImplementor, EnumerableRel.Prefer)} 中生成代码时可使用的方法调用
  *
- * @see HttpTableInsertExecutionLogic#implement(HttpTableModify, ParameterIndex,
- *     EnumerableRelImplementor, EnumerableRel.Prefer)
+ * @see HttpTableInsertExecutionLogic#implement(HttpTableModify, java.util.List, EnumerableRelImplementor, EnumerableRel.Prefer)
  * @author gaohang
  */
 enum HttpApiRuleMethods {

@@ -15,6 +15,35 @@ public class LogicTableExecutorTest {
     final List<Map<String, Object>> values =
         logicTableExecutor.select("select * from route_list where page = 1 and page_size = 100");
     System.out.println("values = " + values);
+
+    final int insertCount =
+        logicTableExecutor.insert("insert into target_table values('test1', 'test2', 'test3')");
+    System.out.println("insertCount = " + insertCount);
+
+    final int batchCount =
+        logicTableExecutor.insert(
+            "insert into target_table values('test1', 'test2', 'test3'),('test4', 'test5', 'test5')");
+    System.out.println("batchCount = " + batchCount);
+
+    final List<Map<String, Object>> pvalues =
+        logicTableExecutor.select(
+            "select * from route_list where page = ? and page_size = ?", 1, 100);
+    System.out.println("pvalues = " + pvalues);
+
+    final int pinsertCount =
+        logicTableExecutor.insert(
+            "insert into target_table values(?, ?, ?)", "test1", "test2", "test3");
+    System.out.println("pinsertCount = " + pinsertCount);
+
+    final int unOrderInsertCount =
+        logicTableExecutor.insert(
+            "insert into target_table (eventCode, eventType, routeName) values(?, ?, ?)", "eventCode", "eventType", "routeName");
+    System.out.println("unOrderInsertCount = " + unOrderInsertCount);
+
+    final int pbatchCount =
+        logicTableExecutor.insert(
+            "insert into target_table values(?, ?, ?),(?, ?, ?)", "test1", "test2", "test3", "test4", "test5", "test6");
+    System.out.println("pbatchCount = " + pbatchCount);
   }
 
   @Test

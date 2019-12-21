@@ -6,7 +6,6 @@ import cn.yxffcode.yugo.obj.ParameterIndex;
 import cn.yxffcode.yugo.obj.RowFilter;
 import cn.yxffcode.yugo.utils.HttpClients;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.interpreter.Bindables;
@@ -25,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static org.apache.calcite.linq4j.Linq4j.iterableEnumerator;
 
 /**
  * insert语句的执行器，用于执行接口的调用，支持子查询
@@ -62,61 +59,63 @@ public class HttpReqTableInsertInvoker extends MapBasedTableInvoker {
    */
   public static Enumerable execute(
       final String schemaName, final String tableName, final DataContext context) {
-    final ParameterIndex pi = (ParameterIndex) context.get(ParameterIndex.CONTEXT_PARAMETER_KEY);
-    final Bindables.BindableTableScan subSelect = pi.getSubSelect();
-    if (subSelect == null) {
-      return invokeByParameterIndex(schemaName, tableName, context, pi);
-    }
-    return invokeBySubSelect(schemaName, tableName, context, subSelect);
-  }
-
-  private static Enumerable invokeBySubSelect(
-      final String schemaName,
-      final String tableName,
-      final DataContext context,
-      final Bindables.BindableTableScan subSelect) {
-    final RowFilter rowFilter = new RowFilter(subSelect.getCluster());
+    final List<ParameterIndex> indexList =
+        (List<ParameterIndex>) context.get(ParameterIndex.CONTEXT_PARAMETER_KEY);
     return new AbstractEnumerable() {
       @Override
       public Enumerator enumerator() {
-        final Enumerable<Object[]> scanValues = subSelect.bind(context);
-        final Enumerable<Object[]> iter = rowFilter.filter(scanValues, context, subSelect);
-
-        final HttpTableDef tableDef = getHttpReqTableDef(schemaName, tableName);
-
-        // invoke insert.
         int count = 0;
-        for (Object[] from : iter) {
-          final ParameterIndex parameterIndex = new ParameterIndex();
-          final List<ColumnDef> columnDefs = tableDef.getColumnDefs();
-          for (int i = 0; i < columnDefs.size() && i < from.length; i++) {
-            final ColumnDef columnDef = columnDefs.get(i);
-            parameterIndex.addLast(columnDef.getName(), from[i]);
+        for (ParameterIndex pi : indexList) {
+          final Bindables.BindableTableScan subSelect = pi.getSubSelect();
+          if (subSelect == null) {
+            count += invokeByParameterIndex(schemaName, tableName, context, pi);
+          } else {
+            count += invokeBySubSelect(schemaName, tableName, context, subSelect);
           }
-          final Enumerable insertResult =
-              invokeByParameterIndex(schemaName, tableName, context, parameterIndex);
-          count += (int) insertResult.first();
         }
         return Linq4j.singletonEnumerator(count);
       }
     };
   }
 
-  private static Enumerable invokeByParameterIndex(
+  private static int invokeBySubSelect(
+      final String schemaName,
+      final String tableName,
+      final DataContext context,
+      final Bindables.BindableTableScan subSelect) {
+    final RowFilter rowFilter = new RowFilter(subSelect.getCluster());
+    final Enumerable<Object[]> scanValues = subSelect.bind(context);
+    final Enumerable<Object[]> iter = rowFilter.filter(scanValues, context, subSelect);
+
+    final HttpTableDef tableDef = getHttpReqTableDef(schemaName, tableName);
+
+    // invoke insert.
+    int count = 0;
+    for (Object[] from : iter) {
+      final ParameterIndex parameterIndex = new ParameterIndex();
+      final List<ColumnDef> columnDefs = tableDef.getColumnDefs();
+      for (int i = 0; i < columnDefs.size() && i < from.length; i++) {
+        final ColumnDef columnDef = columnDefs.get(i);
+        // 这里都是具体的值，不会是？
+        parameterIndex.addLast(columnDef.getName(), from[i], null);
+      }
+      final int insertResult =
+          invokeByParameterIndex(schemaName, tableName, context, parameterIndex);
+      count += (int) insertResult;
+    }
+    return count;
+  }
+
+  private static int invokeByParameterIndex(
       final String schemaName,
       final String tableName,
       final DataContext context,
       final ParameterIndex pi) {
-    return new AbstractEnumerable() {
-      @Override
-      public Enumerator enumerator() {
-        final Map<String, Object> parameterValues = getRequestParameters(pi, context);
-        final HttpTableDef tableDef = getHttpReqTableDef(schemaName, tableName);
-        final HttpReqTableInsertInvoker insertInvoker = new HttpReqTableInsertInvoker(tableDef);
-        final List<Object[]> rows = insertInvoker.apply(parameterValues);
-        return iterableEnumerator(Iterables.transform(rows, row -> row[0]));
-      }
-    };
+    final Map<String, Object> parameterValues = getRequestParameters(pi, context);
+    final HttpTableDef tableDef = getHttpReqTableDef(schemaName, tableName);
+    final HttpReqTableInsertInvoker insertInvoker = new HttpReqTableInsertInvoker(tableDef);
+    final List<Object[]> rows = insertInvoker.apply(parameterValues);
+    return (int) rows.get(0)[0];
   }
 
   private static HttpTableDef getHttpReqTableDef(final String schemaName, final String tableName) {
@@ -150,6 +149,8 @@ public class HttpReqTableInsertInvoker extends MapBasedTableInvoker {
       logger.info("request:{}|{}", 'Y', tableDef.getUrl());
       final String rst = EntityUtils.toString(response.getEntity());
       final Map map = JSON.parseObject(rst, Map.class);
+      logger.debug(
+          "request:{}|{}, params: {}, responses: {}", 'Y', tableDef.getUrl(), request, map);
       tableDef.getTableResultResolver().validate(map);
       return Collections.singletonList(Collections.singletonMap(COUNT_VALUE_KEY, 1));
     }

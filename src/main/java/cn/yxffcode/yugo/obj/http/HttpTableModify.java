@@ -33,7 +33,7 @@ class HttpTableModify extends TableModify implements EnumerableRel {
    *
    * @see HttpTableInsertExecutionLogic#getParameterIndex(HttpTableModify, JavaTypeFactory)
    */
-  private ParameterIndex parameterIndex;
+  private List<ParameterIndex> parameterIndexes;
 
   /**
    * Creates a {@code TableModify}.
@@ -108,18 +108,18 @@ class HttpTableModify extends TableModify implements EnumerableRel {
 
   @Override
   public Result implement(final EnumerableRelImplementor implementor, final Prefer pref) {
-    final ParameterIndex parameterIndex =
+    final List<ParameterIndex> parameterIndexes =
         HttpTableInsertExecutionLogic.getInstance()
             .getParameterIndex(this, implementor.getTypeFactory());
     return HttpTableInsertExecutionLogic.getInstance()
-        .implement(this, parameterIndex, implementor, pref);
+        .implement(this, parameterIndexes, implementor, pref);
   }
 
-  ParameterIndex getParameterIndex() {
-    return parameterIndex;
+  List<ParameterIndex> getParameterIndexes() {
+    return parameterIndexes;
   }
 
-  void setParameterIndex(final ParameterIndex parameterIndex) {
-    this.parameterIndex = parameterIndex;
+  void setParameterIndexes(final List<ParameterIndex> parameterIndexes) {
+    this.parameterIndexes = parameterIndexes;
   }
 }

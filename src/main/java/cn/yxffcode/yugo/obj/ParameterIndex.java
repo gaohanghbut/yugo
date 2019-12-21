@@ -2,6 +2,7 @@ package cn.yxffcode.yugo.obj;
 
 import com.google.common.collect.Maps;
 import org.apache.calcite.interpreter.Bindables;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,14 +39,11 @@ public class ParameterIndex {
   private LinkedHashMap<String, Object> index;
 
   /**
-   * 表示第几个参数， key: columnName, value： 参数的位置，实际上和{@link #index}中的顺序一样，可以去掉了
+   * 表示第几个参数， key: columnName, value： 参数的位置
    *
    * @see #index
    */
   private Map<String, Integer> positions;
-
-  /** {@link #positions}中的value取值，是递增的 */
-  private int pos = 0;
 
   /** 子查询，没有则为null */
   private Bindables.BindableTableScan subSelect;
@@ -71,9 +69,14 @@ public class ParameterIndex {
     return pos;
   }
 
-  public ParameterIndex addLast(final String parameterName, final Object value) {
+  public ParameterIndex addLast(final String parameterName, final Pair<Object, Integer> value) {
+    index.put(parameterName, value.getLeft());
+    positions.put(parameterName, value.getRight());
+    return this;
+  }
+  public ParameterIndex addLast(final String parameterName, final Object value, final Integer position) {
     index.put(parameterName, value);
-    positions.put(parameterName, pos++);
+    positions.put(parameterName, position);
     return this;
   }
 
