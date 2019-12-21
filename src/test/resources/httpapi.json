@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "defaultSchema": "httpapi",
+  "schemas": [
+    {
+      "name": "httpapi",
+      "type": "custom",
+      "factory": "cn.yxffcode.yugo.obj.http.HttpApiSchemaFactory",
+      "operand": {
+        "checker": {
+          "codeKey": "code",
+          "successValue": 0,
+          "dataKey": "data",
+          "errMsgKey": "msg"
+        },
+        "tables": [
+          {
+            "name": "route_list",
+            "url": "http://localhost:8088/route/list",
+            "columns": [
+              {
+                "name": "page",
+                "key": true
+              },
+              {
+                "name": "page_size",
+                "key": true,
+                "mapping": "limit"
+              },
+              ["routeName", "eventType", "eventCode"]
+            ]
+          },
+          {
+            "name": "target_table",
+            "url": "http://localhost:8088/test/insert",
+            "method": "post",
+            "columns": [
+              ["routeName", "eventType", "eventCode"]
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

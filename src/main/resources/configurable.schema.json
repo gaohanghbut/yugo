@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "defaultSchema": "http",
+  "schemas": [
+    {
+      "name": "http",
+      "type": "custom",
+      "factory": "cn.yxffcode.yugo.def.SchemaFactoryImpl",
+      "operand": {
+      }
+    }
+  ]
+}
