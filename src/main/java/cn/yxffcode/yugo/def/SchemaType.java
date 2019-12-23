@@ -2,7 +2,9 @@ package cn.yxffcode.yugo.def;
 
 /** @author gaohang */
 enum SchemaType {
-  HTTP("http");
+  HTTP("http"),
+
+  LOCAL("local");
 
   final String name;
 

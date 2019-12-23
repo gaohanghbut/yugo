@@ -3,6 +3,8 @@ package cn.yxffcode.yugo.def;
 import cn.yxffcode.yugo.obj.TableDef;
 import cn.yxffcode.yugo.obj.http.HttpApiSchemaFactory;
 import cn.yxffcode.yugo.obj.http.HttpTableDef;
+import cn.yxffcode.yugo.obj.local.LocalApiSchemaFactory;
+import cn.yxffcode.yugo.obj.local.LocalServiceTableDef;
 import com.google.common.collect.Maps;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaFactory;
@@ -22,15 +24,21 @@ public class SchemaFactoryImpl implements SchemaFactory {
     factories.put(
         SchemaType.HTTP,
         new HttpApiSchemaFactory(
-            () -> {
-              final Map<String, ? extends TableDef> tableDefs =
-                  SchemaDefBuilder.getTableDefs(SchemaType.HTTP);
-              if (tableDefs == null) {
-                return Collections.emptyMap();
-              }
-              return (Map<String, HttpTableDef>) tableDefs;
-            }));
+            () -> (Map<String, HttpTableDef>) getRegisteredTableDefMap(SchemaType.HTTP)));
+    factories.put(
+        SchemaType.LOCAL,
+        new LocalApiSchemaFactory(
+            () -> (Map<String, LocalServiceTableDef>) getRegisteredTableDefMap(SchemaType.LOCAL)));
     FACTORIES = Collections.unmodifiableMap(factories);
+  }
+
+  private static Map<String, ? extends TableDef> getRegisteredTableDefMap(
+      final SchemaType schemaType) {
+    final Map<String, ? extends TableDef> tableDefs = SchemaDefBuilder.getTableDefs(schemaType);
+    if (tableDefs == null) {
+      return Collections.emptyMap();
+    }
+    return tableDefs;
   }
 
   @Override

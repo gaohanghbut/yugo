@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "defaultSchema": "local",
+  "schemas": [
+    {
+      "name": "local",
+      "type": "custom",
+      "factory": "cn.yxffcode.yugo.obj.local.LocalApiSchemaFactory",
+      "operand": {
+        "tables": [
+          {
+            "name": "local_service",
+            "service": "cn.yxffcode.yugo.obj.local.LocalService",
+            "method": "test",
+            "keys": [
+              "name"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

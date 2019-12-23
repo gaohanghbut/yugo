@@ -8,6 +8,13 @@
       "factory": "cn.yxffcode.yugo.def.SchemaFactoryImpl",
       "operand": {
       }
+    },
+    {
+      "name": "local",
+      "type": "custom",
+      "factory": "cn.yxffcode.yugo.def.SchemaFactoryImpl",
+      "operand": {
+      }
     }
   ]
 }
