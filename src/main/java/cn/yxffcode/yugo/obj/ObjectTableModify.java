@@ -1,6 +1,5 @@
-package cn.yxffcode.yugo.obj.http;
+package cn.yxffcode.yugo.obj;
 
-import cn.yxffcode.yugo.obj.ParameterIndex;
 import org.apache.calcite.adapter.enumerable.EnumerableRel;
 import org.apache.calcite.adapter.enumerable.EnumerableRelImplementor;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
@@ -20,18 +19,19 @@ import java.util.List;
 /**
  * 处理dml语句
  *
- * @see HttpTableInsertExecutionLogic
+ * @see TableInsertExecutionLogic
  * @author gaohang
  */
-class HttpTableModify extends TableModify implements EnumerableRel {
+public class ObjectTableModify extends TableModify implements EnumerableRel {
 
   /** 表定义 */
-  private final HttpTableDef tableDef;
+  private final TableDef tableDef;
 
+  private final TableInsertExecutionLogic tableInsertExecutionLogic;
   /**
    * 参数信息
    *
-   * @see HttpTableInsertExecutionLogic#getParameterIndex(HttpTableModify, JavaTypeFactory)
+   * @see TableInsertExecutionLogic#getParameterIndex(ObjectTableModify, JavaTypeFactory)
    */
   private List<ParameterIndex> parameterIndexes;
 
@@ -57,9 +57,10 @@ class HttpTableModify extends TableModify implements EnumerableRel {
    * @param sourceExpressionList List of value expressions to be set (e.g. exp1, exp2); null if not
    *     UPDATE
    * @param flattened Whether set flattens the input row type
+   * @param tableInsertExecutionLogic 插入逻辑的实现
    */
-  protected HttpTableModify(
-      final HttpTableDef tableDef,
+  public ObjectTableModify(
+      final TableDef tableDef,
       final RelOptCluster cluster,
       final RelTraitSet traitSet,
       final RelOptTable table,
@@ -68,7 +69,8 @@ class HttpTableModify extends TableModify implements EnumerableRel {
       final Operation operation,
       final List<String> updateColumnList,
       final List<RexNode> sourceExpressionList,
-      final boolean flattened) {
+      final boolean flattened,
+      final TableInsertExecutionLogic tableInsertExecutionLogic) {
     super(
         cluster,
         traitSet,
@@ -80,6 +82,7 @@ class HttpTableModify extends TableModify implements EnumerableRel {
         sourceExpressionList,
         flattened);
     this.tableDef = tableDef;
+    this.tableInsertExecutionLogic = tableInsertExecutionLogic;
   }
 
   @Override
@@ -87,13 +90,13 @@ class HttpTableModify extends TableModify implements EnumerableRel {
     return super.computeSelfCost(planner, mq).multiplyBy(.1);
   }
 
-  public HttpTableDef getTableDef() {
+  public TableDef getTableDef() {
     return tableDef;
   }
 
   @Override
   public RelNode copy(RelTraitSet traitSet, List<RelNode> inputs) {
-    return new HttpTableModify(
+    return new ObjectTableModify(
         tableDef,
         getCluster(),
         traitSet,
@@ -103,23 +106,22 @@ class HttpTableModify extends TableModify implements EnumerableRel {
         getOperation(),
         getUpdateColumnList(),
         getSourceExpressionList(),
-        isFlattened());
+        isFlattened(),
+        tableInsertExecutionLogic);
   }
 
   @Override
   public Result implement(final EnumerableRelImplementor implementor, final Prefer pref) {
     final List<ParameterIndex> parameterIndexes =
-        HttpTableInsertExecutionLogic.getInstance()
-            .getParameterIndex(this, implementor.getTypeFactory());
-    return HttpTableInsertExecutionLogic.getInstance()
-        .implement(this, parameterIndexes, implementor, pref);
+        tableInsertExecutionLogic.getParameterIndex(this, implementor.getTypeFactory());
+    return tableInsertExecutionLogic.implement(this, parameterIndexes, implementor, pref);
   }
 
-  List<ParameterIndex> getParameterIndexes() {
+  public List<ParameterIndex> getParameterIndexes() {
     return parameterIndexes;
   }
 
-  void setParameterIndexes(final List<ParameterIndex> parameterIndexes) {
+  public void setParameterIndexes(final List<ParameterIndex> parameterIndexes) {
     this.parameterIndexes = parameterIndexes;
   }
 }

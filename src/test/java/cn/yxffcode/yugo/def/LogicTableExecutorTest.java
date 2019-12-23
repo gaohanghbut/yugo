@@ -1,6 +1,6 @@
 package cn.yxffcode.yugo.def;
 
-import cn.yxffcode.yugo.obj.http.HttpTableResultResolver;
+import cn.yxffcode.yugo.obj.FieldBasedTableResultResolver;
 import org.junit.Test;
 
 import java.util.List;
@@ -37,19 +37,37 @@ public class LogicTableExecutorTest {
 
     final int unOrderInsertCount =
         logicTableExecutor.insert(
-            "insert into target_table (eventCode, eventType, routeName) values(?, ?, ?)", "eventCode", "eventType", "routeName");
+            "insert into target_table (eventCode, eventType, routeName) values(?, ?, ?)",
+            "eventCode",
+            "eventType",
+            "routeName");
     System.out.println("unOrderInsertCount = " + unOrderInsertCount);
 
     final int pbatchCount =
         logicTableExecutor.insert(
-            "insert into target_table values(?, ?, ?),(?, ?, ?)", "test1", "test2", "test3", "test4", "test5", "test6");
+            "insert into target_table values(?, ?, ?),(?, ?, ?)",
+            "test1",
+            "test2",
+            "test3",
+            "test4",
+            "test5",
+            "test6");
     System.out.println("pbatchCount = " + pbatchCount);
+
+    final int pbatchCount2 =
+        logicTableExecutor.insert(
+            "insert into target_table values(?, ?, ?),('test4', 'test5', 'test5')",
+            "test1",
+            "test2",
+            "test3");
+    System.out.println("pbatchCount2 = " + pbatchCount2);
   }
+
 
   @Test
   public void testManulCodeTableConfig() {
-    final HttpTableResultResolver resultResolver =
-        new HttpTableResultResolver("code", 0, "data", "msg");
+    final FieldBasedTableResultResolver resultResolver =
+        new FieldBasedTableResultResolver("code", 0, "data", "msg");
 
     SchemaDefBuilder.http()
         .table("http://localhost:8088/route/list")

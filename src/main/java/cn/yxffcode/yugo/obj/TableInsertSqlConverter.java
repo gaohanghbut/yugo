@@ -1,4 +1,4 @@
-package cn.yxffcode.yugo.obj.http;
+package cn.yxffcode.yugo.obj;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.adapter.enumerable.EnumerableInterpreter;
@@ -21,8 +21,8 @@ import java.util.List;
  *
  * @author gaohang
  */
-public class HttpTableInsertSqlConverter extends RelToSqlConverter {
-  public HttpTableInsertSqlConverter(SqlDialect dialect, JavaTypeFactory typeFactory) {
+public class TableInsertSqlConverter extends RelToSqlConverter {
+  public TableInsertSqlConverter(SqlDialect dialect, JavaTypeFactory typeFactory) {
     super(dialect);
     Util.discard(typeFactory);
   }

@@ -1,6 +1,5 @@
-package cn.yxffcode.yugo.obj.http;
+package cn.yxffcode.yugo.obj;
 
-import cn.yxffcode.yugo.obj.TableResultResolver;
 import net.sf.cglib.beans.BeanMap;
 
 import java.util.Map;
@@ -11,7 +10,7 @@ import java.util.Objects;
  *
  * @author gaohang
  */
-public final class HttpTableResultResolver implements TableResultResolver {
+public final class FieldBasedTableResultResolver implements TableResultResolver {
   private static final String DEFAULT_CODE_KEY = "code";
   private static final int DEFAULT_SUCCESS_VALUE = 200;
   private static final String DEFAULT_DATA_KEY = "data";
@@ -21,7 +20,7 @@ public final class HttpTableResultResolver implements TableResultResolver {
   private String dataKey;
   private String errMsgKey;
 
-  public HttpTableResultResolver(
+  public FieldBasedTableResultResolver(
       final String codeKey,
       final Object successValue,
       final String dataKey,
@@ -33,7 +32,7 @@ public final class HttpTableResultResolver implements TableResultResolver {
     nullToDefault();
   }
 
-  HttpTableResultResolver(final Map<String, Object> checker) {
+  public FieldBasedTableResultResolver(final Map<String, Object> checker) {
     if (checker != null) {
       this.codeKey = (String) checker.get("codeKey");
       this.successValue = checker.get("successValue");
@@ -67,7 +66,7 @@ public final class HttpTableResultResolver implements TableResultResolver {
     }
     final Object code = map.get(codeKey);
     if (!Objects.equals(code, successValue)) {
-      throw new HttpApiCodeValidateException(
+      throw new ApiCodeValidateException(
           "code validate failed, successCode is " + successValue + " actual code is " + code);
     }
   }
@@ -78,7 +77,7 @@ public final class HttpTableResultResolver implements TableResultResolver {
     }
     final Object code = data.get(codeKey);
     if (!Objects.equals(code, successValue)) {
-      throw new HttpApiCodeValidateException(
+      throw new ApiCodeValidateException(
           "code validate failed, successCode is " + successValue + " actual code is " + code);
     }
   }

@@ -1,11 +1,11 @@
 package cn.yxffcode.yugo.def;
 
 import cn.yxffcode.yugo.obj.ColumnDef;
+import cn.yxffcode.yugo.obj.FieldBasedTableResultResolver;
 import cn.yxffcode.yugo.obj.TableDef;
 import cn.yxffcode.yugo.obj.TableResultResolver;
 import cn.yxffcode.yugo.obj.TypeHandler;
 import cn.yxffcode.yugo.obj.http.HttpTableDef;
-import cn.yxffcode.yugo.obj.http.HttpTableResultResolver;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -95,7 +95,7 @@ public abstract class TableDefBuilder {
       final String dataKey,
       final String errMsgKey) {
     return tableResultResolver(
-        new HttpTableResultResolver(codeKey, successValue, dataKey, errMsgKey));
+        new FieldBasedTableResultResolver(codeKey, successValue, dataKey, errMsgKey));
   }
 
   public abstract TableDef build();
