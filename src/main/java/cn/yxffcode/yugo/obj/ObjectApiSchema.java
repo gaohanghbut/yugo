@@ -1,6 +1,5 @@
 package cn.yxffcode.yugo.obj;
 
-import cn.yxffcode.yugo.obj.http.HttpTableDef;
 import com.google.common.collect.Maps;
 import org.apache.calcite.rel.type.RelProtoDataType;
 import org.apache.calcite.schema.Table;
@@ -15,15 +14,14 @@ public abstract class ObjectApiSchema extends AbstractSchema {
   protected final Map<String, RelProtoDataType> typeMap;
   protected final String name;
 
-  protected ObjectApiSchema(
-      final String name, final Map<String, ? extends HttpTableDef> tableDefs) {
+  protected ObjectApiSchema(final String name, final Map<String, ? extends TableDef> tableDefs) {
     this.name = name;
     if (tableDefs == null) {
       this.tableMap = Collections.emptyMap();
     } else {
       final Map<String, Table> tableMap = Maps.newHashMapWithExpectedSize(tableDefs.size());
-      for (Map.Entry<String, ? extends HttpTableDef> en : tableDefs.entrySet()) {
-        final HttpTableDef tableDef = en.getValue();
+      for (Map.Entry<String, ? extends TableDef> en : tableDefs.entrySet()) {
+        final TableDef tableDef = en.getValue();
         tableMap.put(en.getKey(), createTable(tableDef));
       }
       this.tableMap = Collections.unmodifiableMap(tableMap);
@@ -37,7 +35,7 @@ public abstract class ObjectApiSchema extends AbstractSchema {
     this.typeMap = Collections.unmodifiableMap(typeMap);
   }
 
-  protected abstract Table createTable(HttpTableDef tableDef);
+  protected abstract Table createTable(TableDef tableDef);
 
   @Override
   protected Map<String, Table> getTableMap() {

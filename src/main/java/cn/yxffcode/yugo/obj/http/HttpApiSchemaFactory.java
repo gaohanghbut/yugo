@@ -6,6 +6,7 @@ import cn.yxffcode.yugo.obj.FieldBasedTableResultResolver;
 import cn.yxffcode.yugo.obj.GenericTable;
 import cn.yxffcode.yugo.obj.ObjectApiSchema;
 import cn.yxffcode.yugo.obj.ObjectTableModificationRule;
+import cn.yxffcode.yugo.obj.TableDef;
 import cn.yxffcode.yugo.obj.TableResultResolver;
 import cn.yxffcode.yugo.utils.Reflections;
 import com.google.common.collect.Lists;
@@ -173,8 +174,9 @@ public class HttpApiSchemaFactory implements SchemaFactory {
     }
 
     @Override
-    protected Table createTable(final HttpTableDef tableDef) {
-      return new HttpTable(tableDef, new HttpReqTableSelectInvoker(tableDef));
+    protected Table createTable(final TableDef tableDef) {
+      final HttpTableDef httpTableDef = (HttpTableDef) tableDef;
+      return new HttpTable(httpTableDef, new HttpReqTableSelectInvoker(httpTableDef));
     }
   }
 

@@ -32,6 +32,14 @@ public final class ColumnDef {
     this(field.getName(), field.getType(), field.getName(), key);
   }
 
+  public ColumnDef(final String name, final Class<?> type) {
+    this(name, type, name, false, DefaultTypeHandler.getInstance());
+  }
+
+  public ColumnDef(final String name, final Class<?> type, final boolean key) {
+    this(name, type, name, key, DefaultTypeHandler.getInstance());
+  }
+
   public ColumnDef(
       final String name, final Class<?> type, final String mapping, final boolean key) {
     this(name, type, mapping, key, DefaultTypeHandler.getInstance());

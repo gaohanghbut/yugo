@@ -1,7 +1,11 @@
 package cn.yxffcode.yugo.utils;
 
+import com.google.common.collect.Lists;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 
 /** @author gaohang on 15/12/4. */
 public final class Reflections {
@@ -39,6 +43,17 @@ public final class Reflections {
       searchType = searchType.getSuperclass();
     }
     return null;
+  }
+
+  public static List<Field> getFields(Class<?> clazz) {
+    final List<Field> fields = Lists.newArrayList();
+    Class<?> type = clazz;
+    while (type != Object.class) {
+      final Field[] declaredFields = type.getDeclaredFields();
+      fields.addAll(Arrays.asList(declaredFields));
+      type = type.getSuperclass();
+    }
+    return fields;
   }
 
   public static Object getField(String fieldName, Object target) {
